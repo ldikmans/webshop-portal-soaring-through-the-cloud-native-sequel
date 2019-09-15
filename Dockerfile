@@ -1,36 +1,21 @@
-# extended from https://medium.com/oracledevs/quick-start-docker-ized-paas-service-manager-cli-f54eaf4ebcc7
-# added npm, ojet-cli and git
+#  Node based on Debian GNU/Linux 8 -must be used as kafka-avro errors with non-debian based distros
+FROM node
 
-FROM python:3.6.2-alpine3.6
+# Create working directory
+RUN mkdir -p /usr/src/app
+COPY . /usr/src/app
 
-ARG USERNAME
-ARG PASSWORD
-ARG IDENTITY_DOMAIN
-ARG PSM_USERNAME
-ARG PSM_PASSWORD
-ARG PSM_REGION
-ARG PSM_OUTPUT
+# Set working dir
+WORKDIR /usr/src/app
 
-
-WORKDIR "/oracle-cloud-psm-cli/"
-
-RUN apk add --update curl && \
-    rm -rf /var/cache/apk/*
-
-RUN curl -X GET -u $USERNAME:$PASSWORD -H X-ID-TENANT-NAME:$IDENTITY_DOMAIN https://psm.us.oraclecloud.com/paas/core/api/v1.1/cli/$IDENTITY_DOMAIN/client -o psmcli.zip && \
-	pip3 install -U psmcli.zip && \
-	echo -e "$PSM_USERNAME\n$PSM_PASSWORD\n$PSM_PASSWORD\n$IDENTITY_DOMAIN\n$PSM_REGION\n$PSM_OUTPUT" | psm setup
-
-COPY psm-setup-payload.json
-RUN psm setup -c psm-setup-payload.json
-
-RUN apk add --update nodejs nodejs-npm
-RUN apk add --update zip
 
 RUN npm install -g @oracle/ojet-cli
 
-RUN apk update && apk upgrade &&  apk add --no-cache bash git openssh
+RUN npm install
+RUN ojet build
+RUN cp -a ./web/. ./jet-on-node/public
+RUN cd jet-on-node && npm install
 
-COPY build-app.sh .
 
-CMD ["/bin/sh"]
+EXPOSE 3000
+CMD [ "node", "./jet-on-node/bin/www" ]
