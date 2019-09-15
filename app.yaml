@@ -1,0 +1,52 @@
+# APP DEPLOYMENT
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: portal
+  name: portal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: portal
+  template:
+    metadata:
+      labels:
+        app: portal
+    spec:
+      containers:
+      - env:
+        - name: PRODUCT_PORTAL_URL
+          value: "http://18.184.145.38:8080/products"
+        - name: CUSTOMERS_PORTAL_URL
+          value: "http://130.61.226.192:30080"
+        - name: FINANCE_PORTAL_URL
+          value: "http://130.61.226.192:30091/financials"
+        - name: LOYALTY_PORTAL_URL
+          value: ""
+        - name: ORDERS_PORTAL_URL
+          value: "http://129.213.12.1/orders-ms/ui/"
+        - name: APP_VERSION
+          value: "2.0"
+        image: lonneke/webshopportal:1.0
+        name: portal
+        ports:
+        - containerPort: 3000
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: portal
+  name: portal
+spec:
+  ports:
+  - nodePort: 30000
+    port: 80
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app: portal
+  type: NodePort
