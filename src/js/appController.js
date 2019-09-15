@@ -127,7 +127,7 @@ define(['ojs/ojcore', 'knockout', 'ojs/ojrouter', 'ojs/ojknockout', 'ojs/ojarray
 
         //Header
         //Application Name used in Branding Area
-        self.appName = ko.observable("Soaring through the Clouds Webshop Portal - The Mallorca edition");
+        self.appName = ko.observable("Soaring through the Clouds Webshop Portal");
         self.basketTitle = ko.observable("Your shopping basket");
         // User Info used in Global Navigation area
         self.userLogin = ko.observable("Not yet logged in");
